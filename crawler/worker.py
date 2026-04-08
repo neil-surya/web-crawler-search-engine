@@ -4,7 +4,7 @@ import hashlib
 import time
 from threading import Thread
 from urllib.parse import urlparse
-from typing import Any
+from typing import Any, Optional
 
 from utils.download import download
 from crawler import scraper
@@ -63,14 +63,26 @@ class Worker(Thread):
         """Continuously process URLs from the frontier until empty."""
         print(f"Worker-{self.worker_id} starting...")
         
+        # setup a patience counter for empty queues
+        empty_retries: int = 0
+        max_retries: int = 15
+        
         while True:
             # fetch the next url from the queue
-            tbd_url: str = self.frontier.get_tbd_url()
+            tbd_url: Optional[str] = self.frontier.get_tbd_url()
             
-            # break if frontier is empty
+            # handle temporary empty queues (the startup bottleneck)
             if not tbd_url:
-                print(f"Worker-{self.worker_id}: Frontier is empty. Stopping.")
-                break
+                if empty_retries < max_retries:
+                    time.sleep(1.0)
+                    empty_retries += 1
+                    continue
+                else:
+                    print(f"Worker-{self.worker_id}: Frontier is permanently empty. Stopping.")
+                    break
+                    
+            # reset retries once we successfully grab a url
+            empty_retries = 0
                 
             # download the page
             resp: Any = download(tbd_url, self.config)
@@ -88,3 +100,4 @@ class Worker(Thread):
             # mark url as processed and respect politeness delay
             self.frontier.mark_url_complete(tbd_url)
             time.sleep(self.config.time_delay)
+
