@@ -23,3 +23,6 @@ class Config:
         self.seed_urls: list[str] = [
             "https://liquipedia.net/rocketleague/Main_Page"
         ]
+        
+        # safety limit to prevent runaway crawling and storage bloat
+        self.max_pages: int = 2500
