@@ -25,4 +25,4 @@ class Config:
         ]
         
         # safety limit to prevent runaway crawling and storage bloat
-        self.max_pages: int = 2500
+        self.max_pages: int = 200
