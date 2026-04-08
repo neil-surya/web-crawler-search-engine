@@ -27,6 +27,11 @@ class Frontier:
         # safely extract the max pages limit, default to 100 if missing
         self.max_pages: int = getattr(self.config, "max_pages", 100)
 
+        # ensure the save directory exists
+        save_dir: str = os.path.dirname(self.config.save_file)
+        if save_dir:
+            os.makedirs(save_dir, exist_ok=True)
+
         # handle restarting and deleting old save files
         if restart:
             print("Restarting crawler, clearing old frontier state...")
