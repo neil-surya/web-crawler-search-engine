@@ -100,4 +100,3 @@ class Worker(Thread):
             # mark url as processed and respect politeness delay
             self.frontier.mark_url_complete(tbd_url)
             time.sleep(self.config.time_delay)
-

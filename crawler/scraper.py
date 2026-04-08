@@ -66,7 +66,8 @@ def extract_next_links(url: str, resp: Any) -> list[str]:
 
 def is_valid(url: str) -> bool:
     """
-    Check if a URL belongs to Liquipedia Rocket League and is not a trap.
+    Check if a URL belongs to Liquipedia Rocket League, is not a trap,
+    and strictly complies with their robots.txt rules.
 
     Args:
         url (str): The URL to validate.
@@ -97,7 +98,7 @@ def is_valid(url: str) -> bool:
         if parsed.fragment:
             return False
             
-        # block special, user, and talk namespaces
+        # block namespaces defined in our traps and their robots.txt
         if any(namespace in path for namespace in [
             "/Special:", 
             "/User:", 
@@ -105,8 +106,14 @@ def is_valid(url: str) -> bool:
             "/Talk:",
             "/Template:",
             "/Template_talk:",
-            "/Category_talk:"
+            "/Category_talk:",
+            "/Liquipedia:"  # strictly enforces robots.txt rules
         ]):
+            return False
+
+        # block php scripts explicitly disallowed in robots.txt
+        path_lower: str = path.lower()
+        if "index.php" in path_lower or "api.php" in path_lower or path_lower.endswith(".php"):
             return False
 
         # block query parameters that create infinite loops
@@ -132,7 +139,7 @@ def is_valid(url: str) -> bool:
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|war|java|bam|svg|ppsx|pps"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$",
-            path.lower(),
+            path_lower,
         )
     except TypeError:
         return False
