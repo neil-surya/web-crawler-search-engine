@@ -33,7 +33,7 @@ def extract_next_links(url: str, resp: Any) -> list[str]:
     """
     links: list[str] = []
     
-    # if the response failed or isn't HTML, return empty
+    # if the response failed or isn't html, return empty
     if resp is None or resp.status != 200 or resp.raw_response is None:
         return links
 
@@ -66,7 +66,7 @@ def extract_next_links(url: str, resp: Any) -> list[str]:
 
 def is_valid(url: str) -> bool:
     """
-    Check if a URL belongs to allowed domains and is not a trap or file.
+    Check if a URL belongs to Liquipedia Rocket League and is not a trap.
 
     Args:
         url (str): The URL to validate.
@@ -74,13 +74,6 @@ def is_valid(url: str) -> bool:
     Returns:
         bool: True if the URL is valid to crawl, False otherwise.
     """
-    allowed_domains: tuple[str, ...] = (
-        ".ics.uci.edu",
-        ".cs.uci.edu",
-        ".informatics.uci.edu",
-        ".stat.uci.edu",
-    )
-
     try:
         parsed = urlparse(url)
         
@@ -90,33 +83,42 @@ def is_valid(url: str) -> bool:
 
         host: str = (parsed.hostname or "").lower()
         
+        # must be liquipedia
+        if host not in {"liquipedia.net", "www.liquipedia.net"}:
+            return False
+
+        path: str = parsed.path
+        
+        # must stay within the rocket league wiki to avoid other esports
+        if not path.startswith("/rocketleague/"):
+            return False
+
         # reject urls with fragments
         if parsed.fragment:
             return False
             
-        path_lower: str = parsed.path.lower()
-        query_lower: str = parsed.query.lower()
-        
-        # trap filtering
-        if (
-            "timeline" in path_lower or "ml/datasets" in path_lower 
-            or "/events/" in path_lower or "tribe" in path_lower 
-            or "tribe" in query_lower or "wp-login" in path_lower 
-            or "ical" in path_lower or "eppstein/pix" in path_lower 
-            or "doku.php" in path_lower
-            or re.search(r"/\d{4}/\d{2}/\d{2}", parsed.path)
-            or re.search(r"/day/\d{4}-\d{2}-\d{2}", parsed.path)
-            or re.search(r"/\d{4}-\d{2}$", parsed.path)
-            or re.search(r"date=\d{4}-\d{2}-\d{2}", parsed.query)
-        ):
+        # block special, user, and talk namespaces
+        if any(namespace in path for namespace in [
+            "/Special:", 
+            "/User:", 
+            "/User_talk:", 
+            "/Talk:",
+            "/Template:",
+            "/Template_talk:",
+            "/Category_talk:"
+        ]):
             return False
 
-        # block specific subdomains
-        if host == "gitlab.ics.uci.edu":
-            return False
-
-        # ensure domain is in the allowed list
-        if not any(host.endswith(domain) for domain in allowed_domains):
+        # block query parameters that create infinite loops
+        query: str = parsed.query.lower()
+        if any(trap in query for trap in [
+            "action=",
+            "oldid=",
+            "diff=",
+            "dir=",
+            "limit=",
+            "printable="
+        ]):
             return False
 
         # file extension filtering
@@ -130,7 +132,7 @@ def is_valid(url: str) -> bool:
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|war|java|bam|svg|ppsx|pps"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$",
-            path_lower,
+            path.lower(),
         )
     except TypeError:
         return False
