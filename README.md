@@ -120,6 +120,10 @@ The original university project targeted isolated, static school servers. Adapti
 
 Furthermore, hitting a live, modern wiki introduced real-world engineering complexities including dynamic routing, massive interconnected link graphs, and strict Cloudflare rate limits, making the final product much more robust. This genuine utility is exactly why I plan to augment the engine with Local AI (RAG) next, which will allow me to ask natural language questions and get synthesized answers instantly based on the scraped tournament data.
 
+## Acknowledgments & Tools
+- [ ] **CS 121 Project Team:** The foundational architecture and core algorithms adapted for this project were originally built in collaboration with my university groupmates: Cyril Joby, Pranav Sethia, and Rishi Murumkar.
+- [ ] **AI Assistance:** Generative AI was used as a development tool during this solo adaptation to accelerate the creation of the Flask front-end UI boilerplate, troubleshoot complex debugging scenarios (like Windows carriage return parsing), and help format this documentation.
+
 ## Future Enhancement Plans
 - [ ] **Local AI Augmentation (RAG):** Integrate a local LLM (via Ollama) to read the top K search results and generate a conversational, synthesized answer to the user's query directly on the search page.
 - [ ] Spelling correction and fuzzy matching for queries.
