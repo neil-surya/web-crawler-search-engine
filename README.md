@@ -1,7 +1,7 @@
 # Rocket League Liquipedia Search Engine
 
 ## Overview
-As a top 0.75% Rocket League player and avid follower of Rocket League Esports (RLCS), I wanted to build a tool I could actually use to query player stats, team histories, and tournament data at lightning speed. 
+As an avid follower of Rocket League Esports (RLCS), I wanted to build a tool I could actually use to query player stats, team histories, and tournament data at lightning speed. 
 
 This project is a high-performance, full-stack search engine custom-built for the Rocket League Liquipedia wiki. It features a multithreaded web crawler, a disk-based inverted index, and a ranking algorithm utilizing BM25 and PageRank. 
 
