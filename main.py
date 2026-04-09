@@ -1,7 +1,7 @@
 import argparse
 from utils.config import Config
 from crawler.crawler import Crawler
-from indexer.indexer import build_index
+from indexer.indexer import build_index, run_indexer
 
 
 def main() -> None:
@@ -32,7 +32,7 @@ def main() -> None:
         print("=" * 50)
         print("🗂️ BUILDING INVERTED INDEX")
         print("=" * 50)
-        build_index("data/corpus", "data/inverted_index.json")
+        run_indexer("data/corpus")
         return
     
     # initialize global configuration for the crawler
@@ -40,7 +40,7 @@ def main() -> None:
     
     # print a clean startup banner
     print("=" * 50)
-    print("🚀 WEB CRAWLER PIPELINE")
+    print("WEB CRAWLER PIPELINE")
     print("=" * 50)
     print(f"Targeting: {config.seed_urls[0]}")
     print(f"Max Pages: {config.max_pages}")
@@ -53,7 +53,7 @@ def main() -> None:
     
     # print a clean shutdown banner
     print("=" * 50)
-    print("✅ Phase 1 (Crawling) Complete!")
+    print("Phase 1 (Crawling) Complete!")
     print("Data is safely stored in the 'data/corpus' directory.")
     print("=" * 50)
 
