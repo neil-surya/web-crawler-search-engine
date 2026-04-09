@@ -1,6 +1,8 @@
 import argparse
 from utils.config import Config
 from crawler.crawler import Crawler
+from indexer.indexer import build_index
+
 
 def main() -> None:
     """Main entry point for the Web Crawler and Search Engine pipeline."""
@@ -15,15 +17,30 @@ def main() -> None:
         help="Delete the existing frontier state and start a fresh crawl from the seed URLs."
     )
     
+    # add a flag to trigger the indexing phase
+    parser.add_argument(
+        "--index",
+        action="store_true",
+        help="Build the inverted index from the downloaded corpus."
+    )
+    
     # parse the terminal commands
     args: argparse.Namespace = parser.parse_args()
     
-    # initialize global configuration
+    # if the user passed the index flag, build the index and exit immediately
+    if args.index:
+        print("=" * 50)
+        print("🗂️ BUILDING INVERTED INDEX")
+        print("=" * 50)
+        build_index("data/corpus", "data/inverted_index.json")
+        return
+    
+    # initialize global configuration for the crawler
     config: Config = Config()
     
     # print a clean startup banner
     print("=" * 50)
-    print("WEB CRAWLER & SEARCH ENGINE PIPELINE")
+    print("🚀 WEB CRAWLER PIPELINE")
     print("=" * 50)
     print(f"Targeting: {config.seed_urls[0]}")
     print(f"Max Pages: {config.max_pages}")
@@ -36,9 +53,10 @@ def main() -> None:
     
     # print a clean shutdown banner
     print("=" * 50)
-    print("Phase 1 (Crawling) Complete!")
+    print("✅ Phase 1 (Crawling) Complete!")
     print("Data is safely stored in the 'data/corpus' directory.")
     print("=" * 50)
+
 
 if __name__ == "__main__":
     main()
